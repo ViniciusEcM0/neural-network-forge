@@ -25,7 +25,21 @@ class Network:
             
             self.layers.append(Layer(input_size, output_size, activation)) # Create a new Layer with the specified input size, output size, and activation function, and add it to the network's layers
     
-    def predict(self, inputs):
+    def forward(self, inputs):
+        layer_outputs =[inputs]
         for layer in self.layers: # Pass the inputs through each layer of the network, where the output of one layer becomes the input for the next layer
             inputs = layer.predict(inputs)
-        return inputs
+            layer_outputs.append(inputs)
+        
+        return inputs, layer_outputs
+
+    def predict(self, inputs):
+        outputs, _ = self.forward(inputs) # Get the final output of the network by passing the inputs through all layers
+        return outputs
+    
+    def train_example(self, inputs, y_true_list, lr):
+        if len(y_true_list) != len(self.layers[-1].neurons):
+            raise ValueError("O número de saídas verdadeiras deve ser igual ao número de neurônios na camada de saída.")
+        outputs, layer_outputs = self.forward(inputs) # Get the outputs of each layer for the given inputs
+        loss = self.layers[-1].train_example(layer_outputs[-2], y_true_list, lr) # Train the output layer using the true values and the outputs from the last hidden layer as inputs
+        return loss
