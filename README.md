@@ -5,7 +5,7 @@ Este projeto é uma jornada de estudos para entender redes neurais desde seus c�
 
 A ideia não é criar uma biblioteca altamente eficiente que rivalize com PyTorch nem nada do tipo, é apenas reconstruir, passo a passo, os principais conceitos por trás de uma rede neural
 
-'''txt
+```txt
 - neurônio linear
 - pesos e bias
 - previsão
@@ -19,7 +19,7 @@ A ideia não é criar uma biblioteca altamente eficiente que rivalize com PyTorc
 - funções de atiivação
 - ReLU e Leaky ReLU
 - múltiplas camadas em uma rede
-'''
+```
 
 ## Objetivo
 
@@ -27,13 +27,13 @@ Entender, na prática, como uma rede neural funciona em seu interior, sem utiliz
 Talvez esse projeto pareça um pouco denso, mas realmente estamos partindo de um ponto muito em baixo.
 
 O projeto busca implementar manualmente lógicas semelhantes ao que temos em PyTorch, partindo de uma simples função:
-'''python
+```python
 y = x * w + b
-'''
+```
 
 ## Estrutura atual do Projeto
 
-'''txt
+```txt
 project/
 │
 ├── main.py
@@ -45,15 +45,15 @@ project/
 ├── README
 └── docs/
     └── derivacao_gradiente.md
-'''
+```
 
 ### neuron.py
 Contém a classe Neuron. Um neurônio recebe uma lista de entradas, calcula a soma ponderada, aplica uma função de ativação e ajusta seus pesos durante o treino.
 No geral, a forma é:
-'''python
+```python
 z = x1*w1 + x2*w2 + ... + b
 a = activation(z)
-'''
+```
 
 Onde:
 - w(weight) são os pesos treináveis.
@@ -66,7 +66,7 @@ Onde:
 Contem a classe Layer. Uma camada é composta por vários neurônios recebendo os mesmos inputs em paralelo.
 Por exemplo:
 
-'''txt
+```txt
 layer = [neuron_1, neuron_2, neuron_3]
 inputs = [x1, x2]
 
@@ -75,7 +75,7 @@ neuron 2 -> output 2
 neuron 3 -> output 3
 
 saida da camada -> [output_1, output_2, output_3]
-'''
+```
 
 ### network.py
 
@@ -87,7 +87,7 @@ A classe Network foi desenvolvida pensando em flexibilidade, funcionando da segu
 Network([2, 4, 3, 1], internal_act="relu", last_act="linear")
 
 Isso representa:
-'''txt
+```txt
 Input layer        Hidden layer 1        Hidden layer 2        Output layer
   2 inputs            4 neurons             3 neurons            1 neuron┼
 
@@ -98,7 +98,7 @@ Input layer        Hidden layer 1        Hidden layer 2        Output layer
    x2 ────────┼──────── (h3) ───────┤                     │
               │                     │──────── (h3) ───────┘
               └──────── (h4) ───────┘
-'''
+```
 ### activation.py
  Contém as funções de atvação e suas derivadas. Atualmente, o projeto trabalha com as seguintes funções:
  - linear
@@ -107,24 +107,24 @@ Input layer        Hidden layer 1        Hidden layer 2        Output layer
 
  Cada função de ativação também possui sua derivada, usada no cálculo do gradiente. Por exemplo:
 
-'''python
+```python
 def relu(z):
     return max(0, z)
 
 def relu_derivative(z):
     return 1 if z > 0 else 0
-'''
+```
 
 ### data.py
 Contém apenas datasets simples criados manualmente para testar o aprendizado em pequena escala. Exemplo:
 
-'''python
+```python
 dataset = [
     ([1, 1], [6, 3, 5]),
     ([2, 1], [8, 2, 10]),
     ([1, 2], [9, 7, 3]),
 ]
-'''
+```
 
 Cada item possui: (inputs, expected_outputs)
 No geral, é utilizado somente para testes extremamente simples, definindo funções matemáticas, para fazer o input do valor de x para os neurônios treinarem até que retornem o valor de y correto, porém é realmente feito para ser MUITO simples
@@ -133,10 +133,10 @@ No geral, é utilizado somente para testes extremamente simples, definindo funç
 Contém a explicação matemática detalhada da derivação do gradiente. Esse arquivo está aí só pra manter o código limpo, para não ter um comentário de mais de 100 linhas no meio da classe.
 Mas basicamente ele explica como chegamos em fórmulas como:
 
-'''python
+```python
 gradient_w = -2 * error * activation_derivative(z) * input
 gradient_b = -2 * error * activation_derivative(z)
-'''
+```
 
 ## Conceitos implementados até agora
 ### Neurônio linear simples
@@ -155,44 +155,44 @@ Isso faz com que erros positivos e negativos sejam tratados da mesma forma, e er
 O ajuste dos pesos é feito usando a derivada da perda em relação aos parâmetros.
 Para um neurônio linear simples:
 
-'''python
+```python
 gradient_w = -2 * error * x
 gradient_b = -2 * error
 
 E a atualização:
 w = w - learning_rate * gradient_w
 b = b - learning_rate * gradient_b
-'''
+```
 
 ### Multiplas entradas
 O neurônio foi expandido para receber mais de uma entrada, basicamente, tendo mais pesos por neurônio, ou mais "parâmetros", se preferir:
 
-'''python
+```python
 inputs = [x1, x2, x3]
 weights = [w1, w2, w3]
-'''
+```
 
 Como o neurônio sozinho tem só um output, esses inputs precisam ser transformados em 1 output, para isso usamos produto escalar:
-'''python
+```python
 z = x1*w1 + x2*w2 + x3*w3 + b
-'''
+```
 
 que é a mesma coisa que:
-'''python
+```python
 z = dot(inputs, weights) + bias
-'''
+```
 
 ### Camada com múltiplos neurônios
 Depois foi criada a classe Layer, onde vários neurônios recebem os mesmos inputs e produzem, cada um, um output.
 Com isso é possivel aprender várias funções ao mesmo tempo. Por exemplo:
 
-'''txt
+```txt
 input = [x1, x2]
 
 output 1 = 2*x1 + 3*x2 + 1
 output 2 = -1*x1 + 4*x2
 output 3 = 5*x1 - 2*x2 + 2
-'''
+```
 
 ### Funções de ativação
 A saída bruta do neurônio é chamada de z, z é basicamente o y de uma função linear, precisamos aplicar uma função de ativação nele.
@@ -208,29 +208,29 @@ Isso permite que o neurônio deixe de ser uma transformação linear, até agora
 ### ReLU
 A relu basicamente faz um corte na linha da função linear:
 
-'''python
+```python
 if z > 0:
     return z
 else:
     return 0
-'''
+```
 
 A função linear, por regra, desenha uma linha no plano cartesiano, visualmente, o que relu faz é tornar toda a parte da linha reta que passa para o lado negativo de y(vertical) em uma linha reta no eixo x, com um y constante em 0, traçando a linha diagonal novamente somente onde y é positivo.
 
 ### Leaky Relu
 A leaky_relu é basicamente igual a relu, mas ela não zera totalmente o valor de y quando é menor de 0, apenas torna ele muito pequeno:
 
-'''python
+```python
 if z > 0:
     return z
 else:
     return 0.01 * z
-'''
+```
 
 Isso reduz o risco de algum neurônio "morrer", no caso, ficar em um ponto onde ele é sempre menor que 0 e nunca é atualizado, leaky_relu é muito útil principalmente para camadas internas de neurônios, onde eles morrerem é mais comum.
 
 ## Exemplo de Uso
-'''python
+```python
 from network import Network
 from data import dataset
 
@@ -246,7 +246,7 @@ network = Network(
 loss_history = network.train(dataset, lr, epochs)
 
 print(network.predict([5, 1]))
-'''
+```
 
 ## Limitações atuais
 Estou fazendo tudo manualmente do zero, e como o objetivo é didático, tento fazer de forma mais simples, então ainda faltam muitas atualizações para ser uma biblioteca funcional de Deep Learning. Atualmente ele não tem:
