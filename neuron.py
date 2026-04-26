@@ -3,8 +3,9 @@ import random
 
 class Neuron:
     """Single linear neuron with multiple inputs: y = dot(inputs, weights) + b."""
-    def __init__(self, num_inputs, activation):
-        self.weights = [random.random() for _ in range(num_inputs)]
+    
+    def __init__(self, num_inputs, activation): # num_inputs = weights number, activation = activation function
+        self.weights = [random.random() for _ in range(num_inputs)] # initial random weights between 0 and 1
         self.b = 0
 
         if activation not in ACTIVATIONS:
@@ -12,12 +13,12 @@ class Neuron:
         self.activation = ACTIVATIONS[activation]["function"]
         self.activation_derivative = ACTIVATIONS[activation]["derivative"]
     
-    def compute_z(self, inputs):
+    def compute_z(self, inputs): # z = dot(inputs, weights) + b
         if len(inputs) != len(self.weights):
             raise ValueError("Número de entradas diferente do número de pesos.")
-        w_and_x = zip(self.weights, inputs)
-        pred_sum = 0
-        for w, x in w_and_x:
+        w_and_x = zip(self.weights, inputs) # [(w1, x1), (w2, x2), ...]
+        pred_sum = 0 
+        for w, x in w_and_x: # pred_sum = w1*x1 + w2*x2 + ...
             pred_sum += x * w
         z = pred_sum + self.b
         return z
@@ -40,7 +41,7 @@ class Neuron:
         error = y_true - pred_y
         loss = error ** 2
 
-        # Explicação matematica da derivação dos ajustes:
+        # Matematic derivation of the gradients:
         # docs/derivacao_gradiente.md
 
         for i, w in enumerate(self.weights):
@@ -57,16 +58,16 @@ class Neuron:
             raise ValueError("O número de pesos deve ser igual ao número de entradas em cada exemplo do dataset.")
 
         loss_history = []
-        for epoch in range(1, epochs+1):
+        for epoch in range(1, epochs+1): # Training loop
             shuffled_dataset = dataset.copy()
             random.shuffle(shuffled_dataset)
             total_loss = 0
 
-            for inputs, y_true in shuffled_dataset:
+            for inputs, y_true in shuffled_dataset: # Training loop for each example in the dataset
                 loss = self.train_example(inputs, y_true, lr)
                 total_loss += loss
             
-            loss_history.append(total_loss / len(dataset))
+            loss_history.append(total_loss / len(dataset)) # Average loss for the epoch
             if log and epoch % log_interval == 0:
                 print(f"Epoca: {epoch}  |  Perda(loss) total: {total_loss}  |  Perda(loss) média: {total_loss / len(dataset)}")
         return loss_history
