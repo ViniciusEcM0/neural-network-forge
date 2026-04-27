@@ -64,10 +64,14 @@ saida da camada -> [output_1, output_2, output_3]
 
 Contém a classe Network. Uma rede é a sequência de camadas.
 A saída de uma camada viira a entrada da próxima:
+```txt
 inputs -> layer_1 -> layer_2 -> output
+```
 
 A classe Network foi desenvolvida pensando em flexibilidade, funcionando da seguinte forma. Exemplo:
+```python
 Network([2, 4, 3, 1], internal_act="relu", last_act="linear")
+```
 
 Isso representa:
 ```txt
@@ -124,13 +128,17 @@ gradient_b = -2 * error * activation_derivative(z)
 ## Conceitos implementados até agora
 ### Neurônio linear simples
 Primeiro foi implementado um neurônio com só uma entrada:
+```python
 y = x*w + b
+```
 
 O neurônio aprendia ajustando w e b para reduzir o erro entre a previsão e o valor esperado de y
 
 ### Função de perda
 A peerda usada inicialmente é o erro ao quadrado:
+```python
 loss = error ** 2
+```
 
 Isso faz com que erros positivos e negativos sejam tratados da mesma forma, e erros maiores sejam exponencialmente mais penalizados.
 
@@ -142,7 +150,7 @@ Para um neurônio linear simples:
 gradient_w = -2 * error * x
 gradient_b = -2 * error
 
-E a atualização:
+# E a atualização:
 w = w - learning_rate * gradient_w
 b = b - learning_rate * gradient_b
 ```
@@ -181,7 +189,9 @@ output 3 = 5*x1 - 2*x2 + 2
 A saída bruta do neurônio é chamada de z, z é basicamente o y de uma função linear, precisamos aplicar uma função de ativação nele.
 Uma função de ativação serve basicamente como um botão de ligar e desligar o neurônio, em uma rede grade, onde os neurônios trabalham em conjunto e cada um desenvolve seus pesos de acordo com um padrão percebido diferente, não vamos querer que todos os neurônios funcionem em todos os casos, se a entrada não corresponde ao que aquele neurônio se especializou, ele não deve ser ativado, e nem penalizado pela resposta final. Por isso aplicamos alguma função de ativação:
 
+```python
 a = activation(z)
+```
 
 Isso permite que o neurônio deixe de ser uma transformação linear, até agora foram testadas as seguintes ativações:
 - linear
