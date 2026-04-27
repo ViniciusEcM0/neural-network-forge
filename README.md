@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Rede Neural do Zero em python
 
 Este projeto é uma jornada de estudos para entender redes neurais desde seus cálculos mais básicos, sem usar PyTorch, TensorFlow ou NumPy.
