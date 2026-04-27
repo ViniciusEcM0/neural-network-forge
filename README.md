@@ -5,22 +5,6 @@ Este projeto é uma jornada de estudos para entender redes neurais desde seus c�
 
 A ideia não é criar uma biblioteca altamente eficiente que rivalize com PyTorch nem nada do tipo, é apenas reconstruir, passo a passo, os principais conceitos por trás de uma rede neural
 
-```txt
-- neurônio linear
-- pesos e bias
-- previsão
-- erro
-- função de perda
-- gradiente
-- descida do gradiente
-- múltiplas entradas
-- produto escalar
-- múltiplos neurônios em uma camada
-- funções de atiivação
-- ReLU e Leaky ReLU
-- múltiplas camadas em uma rede
-```
-
 ## Objetivo
 
 Entender, na prática, como uma rede neural funciona em seu interior, sem utilizar bibliotecas pre-prontas.
