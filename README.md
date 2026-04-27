@@ -135,7 +135,7 @@ y = x*w + b
 O neurônio aprendia ajustando w e b para reduzir o erro entre a previsão e o valor esperado de y
 
 ### Função de perda
-A peerda usada inicialmente é o erro ao quadrado:
+A perda usada inicialmente é o erro ao quadrado:
 ```python
 loss = error ** 2
 ```
