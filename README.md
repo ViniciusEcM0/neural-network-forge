@@ -72,7 +72,7 @@ Network([2, 4, 3, 1], internal_act="relu", last_act="linear")
 Isso representa:
 ```txt
 Input layer        Hidden layer 1        Hidden layer 2        Output layer
-  2 inputs            4 neurons             3 neurons            1 neuron┼
+  2 inputs            4 neurons             3 neurons            1 neuron
 
               ┌──────── (h1) ───────┐
               │                     │──────── (h1) ───────┐                     
