@@ -34,22 +34,37 @@ class Neuron:
         a = self.activate(z)
         return a
     
-    def train_example(self, inputs, y_true, lr):
+    def forward(self, inputs):
         z = self.compute_z(inputs)
-        pred_y = self.activate(z)
+        a = self.activate(z)
+        return a, z
+    
+    def backward(self, inputs, z, output_gradient, lr):
+        activation_gradient = self.activation_derivative(z)
+        raw_gradient = output_gradient * activation_gradient
+        gradient_w = [raw_gradient * inputs[i] for i in range(len(self.weights))]
+        gradient_b = raw_gradient
+        old_w = self.weights.copy()
 
-        error = y_true - pred_y
+        for i in range(len(self.weights)):
+            self.weights[i] = self.weights[i] - gradient_w[i] * lr
+        self.b = self.b - gradient_b * lr
+
+        return [raw_gradient * w for w in old_w]
+    
+    def train_example(self, inputs, y_true, lr):
+        pred_y, z = self.forward(inputs)
+
+        error = pred_y - y_true
+
         loss = error ** 2
 
         # Matematic derivation of the gradients:
         # docs/derivacao_gradiente.md
 
-        for i, w in enumerate(self.weights):
-            gradient_w = -2 * error * self.activation_derivative(z) * inputs[i]
-            self.weights[i] = self.weights[i] - lr * gradient_w
+        output_gradient = 2 * error
 
-        gradient_b = -2 * error * self.activation_derivative(z)
-        self.b = self.b - lr * gradient_b
+        self.backward(inputs, z, output_gradient, lr)
 
         return loss
     
