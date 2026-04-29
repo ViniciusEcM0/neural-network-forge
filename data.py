@@ -1,20 +1,20 @@
-# Funções escondidas:
-#
-# y1 = ReLU( 2*x1 - 3*x2 + 1)
-# y2 = ReLU(-1*x1 + 4*x2 - 2)
-# y3 = ReLU( 3*x1 - 2*x2 + 0)
+import random
 
-dataset = [
-    ([0, 0], [1, 0, 0]),
-    ([1, 0], [3, 0, 3]),
-    ([0, 1], [0, 2, 0]),
-    ([1, 1], [0, 1, 1]),
-    ([2, 0], [5, 0, 6]),
-    ([0, 2], [0, 6, 0]),
-    ([2, 1], [2, 0, 4]),
-    ([1, 2], [0, 5, 0]),
-    ([3, 1], [4, 0, 7]),
-    ([2, 2], [0, 4, 2]),
-    ([4, 1], [6, 0, 10]),
-    ([1, 3], [0, 9, 0]),
-]
+
+def generate_circle_dataset(amount=500, radius=0.6):
+    dataset = []
+
+    for _ in range(amount):
+        x = random.uniform(-1, 1)
+        y = random.uniform(-1, 1)
+
+        distance_squared = x ** 2 + y ** 2
+
+        if distance_squared <= radius ** 2:
+            label = 1
+        else:
+            label = 0
+
+        dataset.append(([x, y], [label]))
+
+    return dataset

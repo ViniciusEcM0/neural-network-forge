@@ -1,3 +1,5 @@
+import math
+
 def linear(z):
     return z
 
@@ -23,6 +25,14 @@ def leaky_relu_derivative(z):
     return 0.01
 
 
+def sigmoid(z):
+    return 1 / (1 + math.exp(-z))
+
+def sigmoid_derivative(z):
+    s = sigmoid(z)
+    return s * (1 - s)
+
+
 ACTIVATIONS = {
     "linear":{
         "function": linear,
@@ -35,5 +45,9 @@ ACTIVATIONS = {
     "leaky_relu":{
         "function": leaky_relu,
         "derivative": leaky_relu_derivative,
+    },
+    "sigmoid":{
+        "function": sigmoid,
+        "derivative": sigmoid_derivative,
     },
 }

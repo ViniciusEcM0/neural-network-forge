@@ -11,7 +11,7 @@ class Neuron:
         if activation not in ACTIVATIONS:
             raise ValueError(f"Função de ativação '{activation}' não é suportada. Opções: {list(ACTIVATIONS.keys())}")
         self.activation = ACTIVATIONS[activation]["function"]
-        self.activation_derivative = ACTIVATIONS[activation]["derivative"]
+        self.activation_derivative_fn = ACTIVATIONS[activation]["derivative"]
     
     def compute_z(self, inputs): # z = dot(inputs, weights) + b
         if len(inputs) != len(self.weights):
@@ -26,8 +26,8 @@ class Neuron:
     def activate(self, z):
         return self.activation(z)
 
-    def activation_derivative(self, z):
-        return self.activation_derivative(z)
+    def derivative(self, z):
+        return self.activation_derivative_fn(z)
 
     def predict(self, inputs):
         z = self.compute_z(inputs)
@@ -40,7 +40,7 @@ class Neuron:
         return a, z
     
     def backward(self, inputs, z, output_gradient, lr):
-        activation_gradient = self.activation_derivative(z)
+        activation_gradient = self.derivative(z)
         raw_gradient = output_gradient * activation_gradient
         gradient_w = [raw_gradient * inputs[i] for i in range(len(self.weights))]
         gradient_b = raw_gradient
@@ -67,22 +67,3 @@ class Neuron:
         self.backward(inputs, z, output_gradient, lr)
 
         return loss
-    
-    def train(self, dataset, lr, epochs, log=True, log_interval=50):
-        if len(dataset[0][0]) != len(self.weights):
-            raise ValueError("O número de pesos deve ser igual ao número de entradas em cada exemplo do dataset.")
-
-        loss_history = []
-        for epoch in range(1, epochs+1): # Training loop
-            shuffled_dataset = dataset.copy()
-            random.shuffle(shuffled_dataset)
-            total_loss = 0
-
-            for inputs, y_true in shuffled_dataset: # Training loop for each example in the dataset
-                loss = self.train_example(inputs, y_true, lr)
-                total_loss += loss
-            
-            loss_history.append(total_loss / len(dataset)) # Average loss for the epoch
-            if log and epoch % log_interval == 0:
-                print(f"Epoca: {epoch}  |  Perda(loss) total: {total_loss}  |  Perda(loss) média: {total_loss / len(dataset)}")
-        return loss_history
