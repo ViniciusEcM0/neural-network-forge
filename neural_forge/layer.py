@@ -1,5 +1,5 @@
-from activation import ACTIVATIONS
-from neuron import Neuron
+from neural_forge.activation import ACTIVATIONS
+from neural_forge.neuron import Neuron
 
 class Layer:
     """A layer of neurons, where each neuron receives the same inputs but has its own weights,

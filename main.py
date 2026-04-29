@@ -1,5 +1,5 @@
-from layer import Layer
-from network import Network
+from neural_forge.layer import Layer
+from neural_forge.network import Network
 from data import generate_circle_dataset
 
 

@@ -1,4 +1,4 @@
-from activation import ACTIVATIONS
+from neural_forge.activation import ACTIVATIONS
 import random
 
 class Neuron:

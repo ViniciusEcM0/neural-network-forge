@@ -1,6 +1,6 @@
-from layer import Layer
-from activation import ACTIVATIONS
-from loss import LOSSES
+from neural_forge.layer import Layer
+from neural_forge.activation import ACTIVATIONS
+from neural_forge.loss import LOSSES
 import random
 
 class Network:
