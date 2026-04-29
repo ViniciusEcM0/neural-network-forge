@@ -26,15 +26,21 @@ class Network:
             self.layers.append(Layer(input_size, output_size, activation)) # Create a new Layer with the specified input size, output size, and activation function, and add it to the network's layers
     
     def forward(self, inputs):
-        layer_outputs =[inputs]
-        for layer in self.layers: # Pass the inputs through each layer of the network, where the output of one layer becomes the input for the next layer
-            inputs = layer.predict(inputs)
-            layer_outputs.append(inputs)
-        
-        return inputs, layer_outputs
+        layer_outputs = [inputs]
+        z_lists = []
+        current_inputs = inputs
+
+        for layer in self.layers:
+            output, z = layer.forward(current_inputs)
+            layer_outputs.append(output)
+            z_lists.append(z)
+
+            current_inputs = output
+
+        return current_inputs, layer_outputs, z_lists
 
     def predict(self, inputs):
-        outputs, _ = self.forward(inputs) # Get the final output of the network by passing the inputs through all layers
+        outputs, _, _ = self.forward(inputs) # Get the final output of the network by passing the inputs through all layers
         return outputs
     
     def train_example(self, inputs, y_true_list, lr):
