@@ -1,5 +1,6 @@
 from layer import Layer
 from activation import ACTIVATIONS
+from loss import LOSSES
 import random
 
 class Network:
@@ -7,11 +8,16 @@ class Network:
     layers of neurons. The network can be trained using backpropagation to adjust the
     weights and biases of the neurons based on the error between predicted and true values."""
 
-    def __init__(self, layers, internal_act, last_act): # layers = list of layer sizes, internal_act = activation function for hidden layers, last_act = activation function for output layer
+    def __init__(self, layers, internal_act, last_act, loss): # layers = list of layer sizes, internal_act = activation function for hidden layers, last_act = activation function for output layer
         if internal_act not in ACTIVATIONS or last_act not in ACTIVATIONS:
             raise ValueError(f"Função de ativação '{internal_act}' ou '{last_act}' não é suportada. Opções: {list(ACTIVATIONS.keys())}")
         if len(layers) < 2:
             raise ValueError("A rede deve ter pelo menos 2 camadas (entrada e saída).")
+        if loss not in LOSSES:
+            raise ValueError(f"Função de perda '{loss}' não é suportada. Opções: {list(LOSSES.keys())}")
+        
+        self.loss_fn = LOSSES[loss]["function"]
+        self.loss_derivative_fn = LOSSES[loss]["derivative"]
         
         self.layers = []
         # Create the layers of the network based on the specified layer sizes and activation functions
@@ -59,9 +65,11 @@ class Network:
         total_loss = 0
         output_gradients = []
         for i in range(len(outputs)):
-            error = outputs[i] - y_true_list[i]
-            total_loss += error ** 2
-            output_gradients.append(2 * error)
+            y_pred = outputs[i]
+            y_true = y_true_list[i]
+
+            total_loss += self.loss_fn(y_pred, y_true)
+            output_gradients.append(self.loss_derivative_fn(y_pred, y_true))
         self.backward(layer_outputs, z_lists, output_gradients, lr)
 
         return total_loss
@@ -85,3 +93,17 @@ class Network:
             if log and epoch % log_interval == 0:
                 print(f"Época {epoch}  |  total_loss: {total_loss}  |  loss: {avg_loss}")
         return loss_history
+    
+    def evaluate(self, dataset):
+        correct = 0
+
+        for inputs, y_true_list in dataset:
+            pred = self.predict(inputs)[0]
+            pred_class = 1 if pred >= 0.5 else 0
+            true_class = y_true_list[0]
+
+            if pred_class == true_class:
+                correct += 1
+
+        accuracy = correct / len(dataset)
+        return accuracy
