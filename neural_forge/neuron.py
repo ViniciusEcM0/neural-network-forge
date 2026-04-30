@@ -85,6 +85,6 @@ class Neuron:
 
         output_gradient = 2 * error
 
-        self.backward(inputs, z, output_gradient, lr)
+        self.backward(inputs, z, output_gradient)
 
         return loss
