@@ -1,4 +1,3 @@
-from neural_forge.layer import Layer
 from neural_forge.network import Network
 from data import generate_circle_dataset
 
@@ -7,7 +6,7 @@ train_dataset = generate_circle_dataset(1000, 0.6)
 test_dataset = generate_circle_dataset(200, 0.6)
 
 lr = 0.01
-epochs = 500
+epochs = 1500
 batch_size = 32
 
 network = Network(
@@ -17,7 +16,7 @@ network = Network(
     loss="binary_cross_entropy",
     init_method="he"
 )
-network.train(train_dataset, lr, epochs, batch_size)
+network.train(train_dataset, lr, epochs, batch_size, "sgd")
 
 train_accuracy = network.evaluate(train_dataset)
 test_accuracy = network.evaluate(test_dataset)

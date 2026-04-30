@@ -1,6 +1,6 @@
 from .activation import ACTIVATIONS
 from .initialization import INITIALIZERS
-import random
+from .optimizer import SGD
 
 class Neuron:
     """Single linear neuron with multiple inputs: y = dot(inputs, weights) + b."""
@@ -62,18 +62,18 @@ class Neuron:
 
         return [raw_gradient * w for w in old_w]
     
-    def apply_gradients(self, lr, batch_size):
+    def apply_gradients(self, lr, batch_size, optimizer):
         for i in range(len(self.weights)):
             avg_gradient = self.weight_gradients_sum[i] / batch_size
-            self.weights[i] -= lr * avg_gradient
+            self.weights[i] = optimizer.update(self.weights[i], avg_gradient, lr)
         avg_bias_gradient = self.bias_gradients_sum / batch_size
-        self.b -= lr * avg_bias_gradient
+        self.b = optimizer.update(self.b, avg_bias_gradient, lr)
     
     def zero_gradients(self):
         self.weight_gradients_sum = [0 for _ in self.weights]
         self.bias_gradients_sum = 0
     
-    def train_example(self, inputs, y_true, lr):
+    def train_example(self, inputs, y_true):
         pred_y, z = self.forward(inputs)
 
         error = pred_y - y_true

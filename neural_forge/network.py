@@ -1,6 +1,7 @@
 from .layer import Layer
 from .activation import ACTIVATIONS
 from .loss import LOSSES
+from .optimizer import OPTIMIZERS
 import random
 
 class Network:
@@ -55,9 +56,9 @@ class Network:
 
         return output_gradients
     
-    def apply_gradients(self, lr, batch_size):
+    def apply_gradients(self, lr, batch_size, optimizer):
         for layer in self.layers:
-            layer.apply_gradients(lr, batch_size)
+            layer.apply_gradients(lr, batch_size, optimizer)
 
     def zero_gradients(self):
         for layer in self.layers:
@@ -84,7 +85,12 @@ class Network:
 
         return total_loss
 
-    def train(self, dataset, lr, epochs, batch_size, log=True, log_interval=50):
+    def train(self, dataset, lr, epochs, batch_size, optimizer, log=True, log_interval=50):
+        if optimizer not in OPTIMIZERS:
+            raise ValueError(f"Otimizador '{optimizer}' não é suportado. Opções: {list(OPTIMIZERS.keys())}")
+        
+        optimizer_fn = OPTIMIZERS[optimizer]
+
         loss_history = []
 
         for epoch in range(1, epochs+1):
@@ -102,7 +108,7 @@ class Network:
                     loss = self.train_example(inputs, y_true_list)
                     total_loss += loss
                 
-                self.apply_gradients(lr, len(batch))
+                self.apply_gradients(lr, len(batch), optimizer_fn)
 
             avg_loss = total_loss/(len(dataset) * len(self.layers[-1].neurons))
             loss_history.append(avg_loss)

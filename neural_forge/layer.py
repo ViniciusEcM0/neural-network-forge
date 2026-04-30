@@ -41,9 +41,9 @@ class Layer:
 
         return input_grad_total
     
-    def apply_gradients(self, lr, batch_size):
+    def apply_gradients(self, lr, batch_size, optimizer):
         for neuron in self.neurons:
-            neuron.apply_gradients(lr, batch_size)
+            neuron.apply_gradients(lr, batch_size, optimizer)
     
     def zero_gradients(self):
         for neuron in self.neurons:
