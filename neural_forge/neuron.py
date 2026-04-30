@@ -1,17 +1,26 @@
-from neural_forge.activation import ACTIVATIONS
+from .activation import ACTIVATIONS
+from .initialization import INITIALIZERS
 import random
 
 class Neuron:
     """Single linear neuron with multiple inputs: y = dot(inputs, weights) + b."""
     
-    def __init__(self, num_inputs, activation): # num_inputs = weights number, activation = activation function
-        self.weights = [random.random() for _ in range(num_inputs)] # initial random weights between 0 and 1
+    def __init__(self, num_inputs, activation, init_method): # num_inputs = weights number, activation = activation function
+        if activation not in ACTIVATIONS:
+            raise ValueError(f"Função de ativação '{activation}' não é suportada. Opções: {list(ACTIVATIONS.keys())}")
+        if init_method not in INITIALIZERS:
+            raise ValueError(f"Método de inicialização '{init_method}' não é suportado. Opções: {list(INITIALIZERS.keys())}")
+
+        self.weights = INITIALIZERS[init_method](num_inputs) # Initialize the weights of the neuron using the specified initialization method, which generates a list of weights based on the number of inputs and outputs
         self.b = 0
 
         if activation not in ACTIVATIONS:
             raise ValueError(f"Função de ativação '{activation}' não é suportada. Opções: {list(ACTIVATIONS.keys())}")
         self.activation = ACTIVATIONS[activation]["function"]
         self.activation_derivative_fn = ACTIVATIONS[activation]["derivative"]
+
+        self.weight_gradients_sum = [0 for _ in range(num_inputs)]
+        self.bias_gradients_sum = 0
     
     def compute_z(self, inputs): # z = dot(inputs, weights) + b
         if len(inputs) != len(self.weights):
@@ -39,18 +48,30 @@ class Neuron:
         a = self.activate(z)
         return a, z
     
-    def backward(self, inputs, z, output_gradient, lr):
+    def backward(self, inputs, z, output_gradient):
         activation_gradient = self.derivative(z)
         raw_gradient = output_gradient * activation_gradient
-        gradient_w = [raw_gradient * inputs[i] for i in range(len(self.weights))]
-        gradient_b = raw_gradient
+
         old_w = self.weights.copy()
 
         for i in range(len(self.weights)):
-            self.weights[i] = self.weights[i] - gradient_w[i] * lr
-        self.b = self.b - gradient_b * lr
+            weight_gradient = raw_gradient * inputs[i]
+            self.weight_gradients_sum[i] += weight_gradient
+        
+        self.bias_gradients_sum += raw_gradient
 
         return [raw_gradient * w for w in old_w]
+    
+    def apply_gradients(self, lr, batch_size):
+        for i in range(len(self.weights)):
+            avg_gradient = self.weight_gradients_sum[i] / batch_size
+            self.weights[i] -= lr * avg_gradient
+        avg_bias_gradient = self.bias_gradients_sum / batch_size
+        self.b -= lr * avg_bias_gradient
+    
+    def zero_gradients(self):
+        self.weight_gradients_sum = [0 for _ in self.weights]
+        self.bias_gradients_sum = 0
     
     def train_example(self, inputs, y_true, lr):
         pred_y, z = self.forward(inputs)

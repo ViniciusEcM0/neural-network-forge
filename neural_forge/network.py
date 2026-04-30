@@ -1,6 +1,6 @@
-from neural_forge.layer import Layer
-from neural_forge.activation import ACTIVATIONS
-from neural_forge.loss import LOSSES
+from .layer import Layer
+from .activation import ACTIVATIONS
+from .loss import LOSSES
 import random
 
 class Network:
@@ -8,7 +8,7 @@ class Network:
     layers of neurons. The network can be trained using backpropagation to adjust the
     weights and biases of the neurons based on the error between predicted and true values."""
 
-    def __init__(self, layers, internal_act, last_act, loss): # layers = list of layer sizes, internal_act = activation function for hidden layers, last_act = activation function for output layer
+    def __init__(self, layers, internal_act, last_act, loss, init_method): # layers = list of layer sizes, internal_act = activation function for hidden layers, last_act = activation function for output layer
         if internal_act not in ACTIVATIONS or last_act not in ACTIVATIONS:
             raise ValueError(f"Função de ativação '{internal_act}' ou '{last_act}' não é suportada. Opções: {list(ACTIVATIONS.keys())}")
         if len(layers) < 2:
@@ -30,7 +30,7 @@ class Network:
             else:
                 activation = last_act
             
-            self.layers.append(Layer(input_size, output_size, activation)) # Create a new Layer with the specified input size, output size, and activation function, and add it to the network's layers
+            self.layers.append(Layer(input_size, output_size, activation,  init_method)) # Create a new Layer with the specified input size, output size, and activation function, and add it to the network's layers
     
     def forward(self, inputs):
         layer_outputs = [inputs]
@@ -46,18 +46,28 @@ class Network:
 
         return current_inputs, layer_outputs, z_lists
     
-    def backward(self, layer_outputs, z_lists, output_gradients, lr):
+    def backward(self, layer_outputs, z_lists, output_gradients):
         for layer_index in reversed(range(len(self.layers))):
             layer_input = layer_outputs[layer_index]
             layer_z_list = z_lists[layer_index]
-            output_gradients = self.layers[layer_index].backward(layer_input, layer_z_list, output_gradients, lr)
+
+            output_gradients = self.layers[layer_index].backward(layer_input, layer_z_list, output_gradients)
+
         return output_gradients
+    
+    def apply_gradients(self, lr, batch_size):
+        for layer in self.layers:
+            layer.apply_gradients(lr, batch_size)
+
+    def zero_gradients(self):
+        for layer in self.layers:
+            layer.zero_gradients()
 
     def predict(self, inputs):
         outputs, _, _ = self.forward(inputs) # Get the final output of the network by passing the inputs through all layers
         return outputs
     
-    def train_example(self, inputs, y_true_list, lr):
+    def train_example(self, inputs, y_true_list):
         if len(y_true_list) != len(self.layers[-1].neurons):
             raise ValueError("O número de saídas verdadeiras deve ser igual ao número de neurônios na camada de saída.")
         
@@ -70,11 +80,11 @@ class Network:
 
             total_loss += self.loss_fn(y_pred, y_true)
             output_gradients.append(self.loss_derivative_fn(y_pred, y_true))
-        self.backward(layer_outputs, z_lists, output_gradients, lr)
+        self.backward(layer_outputs, z_lists, output_gradients)
 
         return total_loss
 
-    def train(self, dataset, lr, epochs, log=True, log_interval=50):
+    def train(self, dataset, lr, epochs, batch_size, log=True, log_interval=50):
         loss_history = []
 
         for epoch in range(1, epochs+1):
@@ -82,16 +92,24 @@ class Network:
             random.shuffle(shuffled_dataset)
 
             total_loss = 0
+            
+            for start in range(0, len(shuffled_dataset), batch_size):
+                batch = shuffled_dataset[start:start+batch_size]
 
-            for inputs, y_true_list in shuffled_dataset:
-                loss = self.train_example(inputs, y_true_list, lr)
-                total_loss += loss
+                self.zero_gradients()
+
+                for inputs, y_true_list in batch:
+                    loss = self.train_example(inputs, y_true_list)
+                    total_loss += loss
+                
+                self.apply_gradients(lr, len(batch))
 
             avg_loss = total_loss/(len(dataset) * len(self.layers[-1].neurons))
             loss_history.append(avg_loss)
 
             if log and epoch % log_interval == 0:
                 print(f"Época {epoch}  |  total_loss: {total_loss}  |  loss: {avg_loss}")
+
         return loss_history
     
     def evaluate(self, dataset):
