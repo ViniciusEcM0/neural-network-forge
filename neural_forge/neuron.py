@@ -65,9 +65,9 @@ class Neuron:
     def apply_gradients(self, lr, batch_size, optimizer):
         for i in range(len(self.weights)):
             avg_gradient = self.weight_gradients_sum[i] / batch_size
-            self.weights[i] = optimizer.update(self.weights[i], avg_gradient, lr)
+            self.weights[i] = optimizer.update(self.weights[i], avg_gradient, lr, param_id=f"{id(self)}.weight.{i}")
         avg_bias_gradient = self.bias_gradients_sum / batch_size
-        self.b = optimizer.update(self.b, avg_bias_gradient, lr)
+        self.b = optimizer.update(self.b, avg_bias_gradient, lr, param_id=f"{id(self)}.bias")
     
     def zero_gradients(self):
         self.weight_gradients_sum = [0 for _ in self.weights]
